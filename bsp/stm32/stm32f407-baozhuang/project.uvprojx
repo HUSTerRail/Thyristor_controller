@@ -52,7 +52,7 @@
           <OutputName>rt-thread</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\build\keil\List\</ListingPath>
@@ -336,7 +336,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--gnu</MiscControls>
+              <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER, STM32F407xx, RT_USING_ARM_LIBC</Define>
               <Undefine></Undefine>
               <IncludePath>applications;.;packages\CmBacktrace-v1.4.0;..\..\..\libcpu\arm\cortex-m4;..\..\..\libcpu\arm\common;..\..\..\components\drivers\include;..\..\..\components\drivers\hwcrypto;.;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\spi;..\..\..\components\drivers\include;..\..\..\components\drivers\spi\sfud\inc;..\..\..\components\drivers\include;..\..\..\components\drivers\include;board;board\CubeMX_Config\Inc;board\ports;..\libraries\HAL_Drivers;..\libraries\HAL_Drivers\config;..\libraries\HAL_Drivers\drv_flash;..\..\..\components\dfs\include;..\..\..\components\dfs\filesystems\devfs;..\..\..\components\dfs\filesystems\elmfat;..\..\..\components\finsh;.;..\..\..\include;..\..\..\components\libc\compilers\armlibc;..\..\..\components\libc\compilers\common;..\..\..\components\libc\termios;packages\libmodbus-latest\examples;packages\libmodbus-latest\inc;..\..\..\components\net\lwip-2.0.2\src;..\..\..\components\net\lwip-2.0.2\src\include;..\..\..\components\net\lwip-2.0.2\src\include\ipv4;..\..\..\components\net\lwip-2.0.2\src\arch\include;..\..\..\components\net\lwip-2.0.2\src\include\netif;..\..\..\components\net\lwip-2.0.2\src\include\posix;..\..\..\components\net\netdev\include;..\..\..\components\drivers\usb\usbhost;..\..\..\components\drivers\usb\usbhost\class;..\..\..\components\drivers\usb\usbhost\core;..\..\..\components\drivers\usb\usbhost\include;..\..\..\components\drivers\include;packages\state_machine-latest\examples;packages\state_machine-latest\inc;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\libraries\STM32F4xx_HAL\CMSIS\Include;..\..\..\components\utilities\ulog;..\..\..\components\utilities\ymodem</IncludePath>
@@ -387,56 +387,6 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>applications\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>can_com_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\can_com_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>CanToWifi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\CanToWifi.c</FilePath>
-            </File>
-            <File>
-              <FileName>DriverStatus.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\DriverStatus.c</FilePath>
-            </File>
-            <File>
-              <FileName>controller.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\controller.c</FilePath>
-            </File>
-            <File>
-              <FileName>monitor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\monitor.c</FilePath>
-            </File>
-            <File>
-              <FileName>fn_handlers.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\fn_handlers.c</FilePath>
-            </File>
-            <File>
-              <FileName>params.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\params.c</FilePath>
-            </File>
-            <File>
-              <FileName>hci.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\hci.c</FilePath>
-            </File>
-            <File>
-              <FileName>menu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\menu.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbhtest.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\usbhtest.c</FilePath>
             </File>
           </Files>
         </Group>

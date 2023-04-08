@@ -5,16 +5,6 @@ cwd     = GetCurrentDir()
 CPPPATH = [cwd, str(Dir('#'))]
 src     = Split("""
 main.c
-can_com_task.c
-CanToWifi.c
-DriverStatus.c
-controller.c
-monitor.c
-fn_handlers.c
-params.c
-hci.c
-menu.c
-usbhtest.c
 """)
 
 group = DefineGroup('Applications', src, depend = [''], CPPPATH = CPPPATH)
