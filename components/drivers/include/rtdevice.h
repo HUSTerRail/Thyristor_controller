@@ -101,6 +101,7 @@ extern "C" {
 
 #ifdef RT_USING_ADC
 #include "drivers/adc.h"
+#include "drivers/dac.h"
 #endif
 
 #ifdef RT_USING_PWM

@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER, STM32F407xx, RT_USING_ARM_LIBC</Define>
               <Undefine></Undefine>
-              <IncludePath>applications;.;packages\CmBacktrace-v1.4.0;..\..\..\libcpu\arm\cortex-m4;..\..\..\libcpu\arm\common;..\..\..\components\drivers\include;..\..\..\components\drivers\hwcrypto;.;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\spi;..\..\..\components\drivers\include;..\..\..\components\drivers\spi\sfud\inc;..\..\..\components\drivers\include;..\..\..\components\drivers\include;board;board\CubeMX_Config\Inc;board\ports;..\libraries\HAL_Drivers;..\libraries\HAL_Drivers\config;..\libraries\HAL_Drivers\drv_flash;..\..\..\components\dfs\include;..\..\..\components\dfs\filesystems\devfs;..\..\..\components\dfs\filesystems\elmfat;..\..\..\components\finsh;.;..\..\..\include;..\..\..\components\libc\compilers\armlibc;..\..\..\components\libc\compilers\common;..\..\..\components\libc\termios;packages\libmodbus-latest\examples;packages\libmodbus-latest\inc;..\..\..\components\net\lwip-2.0.2\src;..\..\..\components\net\lwip-2.0.2\src\include;..\..\..\components\net\lwip-2.0.2\src\include\ipv4;..\..\..\components\net\lwip-2.0.2\src\arch\include;..\..\..\components\net\lwip-2.0.2\src\include\netif;..\..\..\components\net\lwip-2.0.2\src\include\posix;..\..\..\components\net\netdev\include;..\..\..\components\drivers\usb\usbhost;..\..\..\components\drivers\usb\usbhost\class;..\..\..\components\drivers\usb\usbhost\core;..\..\..\components\drivers\usb\usbhost\include;..\..\..\components\drivers\include;packages\state_machine-latest\examples;packages\state_machine-latest\inc;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\libraries\STM32F4xx_HAL\CMSIS\Include;..\..\..\components\utilities\ulog;..\..\..\components\utilities\ymodem</IncludePath>
+              <IncludePath>applications;.;packages\CmBacktrace-v1.4.0;..\..\..\libcpu\arm\cortex-m4;..\..\..\libcpu\arm\common;..\..\..\components\drivers\include;..\..\..\components\drivers\hwcrypto;.;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\spi;..\..\..\components\drivers\include;..\..\..\components\drivers\spi\sfud\inc;..\..\..\components\drivers\include;..\..\..\components\drivers\include;board;board\CubeMX_Config\Inc;board\ports;..\libraries\HAL_Drivers;..\libraries\HAL_Drivers\config;..\libraries\HAL_Drivers\drv_flash;..\..\..\components\dfs\include;..\..\..\components\dfs\filesystems\devfs;..\..\..\components\dfs\filesystems\elmfat;..\..\..\components\finsh;.;..\..\..\include;..\..\..\components\libc\compilers\armlibc;..\..\..\components\libc\compilers\common;..\..\..\components\libc\termios;packages\libmodbus-latest\examples;packages\libmodbus-latest\inc;..\..\..\components\net\lwip-2.0.2\src;..\..\..\components\net\lwip-2.0.2\src\include;..\..\..\components\net\lwip-2.0.2\src\include\ipv4;..\..\..\components\net\lwip-2.0.2\src\arch\include;..\..\..\components\net\lwip-2.0.2\src\include\netif;..\..\..\components\net\lwip-2.0.2\src\include\posix;..\..\..\components\net\netdev\include;..\..\..\components\drivers\usb\usbhost;..\..\..\components\drivers\usb\usbhost\class;..\..\..\components\drivers\usb\usbhost\core;..\..\..\components\drivers\usb\usbhost\include;..\..\..\components\drivers\include;packages\state_machine-latest\examples;packages\state_machine-latest\inc;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\libraries\STM32F4xx_HAL\CMSIS\Include;..\..\..\components\utilities\ulog;..\..\..\components\utilities\ymodem;..\..\..\components\drivers\include\drivers</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -387,6 +387,21 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>applications\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>modbus_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\modbus_interface.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\ADC.c</FilePath>
+            </File>
+            <File>
+              <FileName>DAC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\DAC.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -680,6 +695,11 @@
               <FileName>watchdog.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\components\drivers\watchdog\watchdog.c</FilePath>
+            </File>
+            <File>
+              <FileName>dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\drivers\misc\dac.c</FilePath>
             </File>
           </Files>
         </Group>
