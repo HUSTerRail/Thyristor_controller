@@ -23,7 +23,7 @@
  * @parm offset : 参数地址
  * @parm buffer : 数据缓存区，已经是偏置后的
  */
-uint16_t Charging_state[7] = {0,0,0,0,0,0,0};
+uint16_t Charging_state[7] = {1,0,1,0,1,0,1};
 void sync_parms_to_buffer(int offset , uint16_t * buffer , uint16_t len)  //主机从从机读取单个寄存器数据，初始地址为0x1000
 {
 	RT_ASSERT(offset >= 0);
@@ -39,19 +39,19 @@ void sync_parms_to_buffer(int offset , uint16_t * buffer , uint16_t len)  //主�
 	{
 		buffer[0] = Charging_state[2];
 	}
-	if(offset == 0x0000)  //代表地址为0x1000+offset，当前ad通道4输出状态
+	if(offset == 0x0003)  //代表地址为0x1000+offset，当前ad通道4输出状态
 	{
 		buffer[0] = Charging_state[3];
 	}
-	if(offset == 0x0001)   //代表地址为0x1000+offset，当前ad通道5输出状态
+	if(offset == 0x0004)   //代表地址为0x1000+offset，当前ad通道5输出状态
 	{
 		buffer[0] = Charging_state[4];
 	}
-	if(offset == 0x0002)   //代表地址为0x1000+offset，当前ad通道6输出状态
+	if(offset == 0x0005)   //代表地址为0x1000+offset，当前ad通道6输出状态
 	{
 		buffer[0] = Charging_state[5];
 	}
-	if(offset == 0x0000)  //代表地址为0x1000+offset，当前ad通道7输出状态
+	if(offset == 0x0006)  //代表地址为0x1000+offset，当前ad通道7输出状态
 	{
 		buffer[0] = Charging_state[6];
 	}

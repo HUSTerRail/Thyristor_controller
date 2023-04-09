@@ -15,7 +15,7 @@
 
 
 /* defined the LED0 pin: PF9 */
-#define LED0_PIN    GET_PIN(G, 10)
+#define LED0_PIN    GET_PIN(G, 0)
 
 
 int main(void)
