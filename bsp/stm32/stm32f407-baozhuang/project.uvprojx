@@ -389,19 +389,14 @@
               <FilePath>applications\main.c</FilePath>
             </File>
             <File>
-              <FileName>modbus_interface.c</FileName>
+              <FileName>uart_sample.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\applications\modbus_interface.c</FilePath>
+              <FilePath>.\applications\uart_sample.c</FilePath>
             </File>
             <File>
-              <FileName>ADC.c</FileName>
+              <FileName>AD_read.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\applications\ADC.c</FilePath>
-            </File>
-            <File>
-              <FileName>DAC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\DAC.c</FilePath>
+              <FilePath>.\applications\AD_read.c</FilePath>
             </File>
           </Files>
         </Group>
