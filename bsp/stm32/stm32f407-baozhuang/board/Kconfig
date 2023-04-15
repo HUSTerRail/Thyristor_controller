@@ -204,12 +204,18 @@ menu "On-chip Peripheral Drivers"
         default n
         select RT_USING_PWM
         if BSP_USING_PWM
-        menuconfig BSP_USING_PWM2
-            bool "Enable timer2 output pwm"
+        menuconfig BSP_USING_PWM1
+            bool "Enable timer1 output pwm"
             default n
-            if BSP_USING_PWM2
-                config BSP_USING_PWM2_CH4
-                    bool "Enable PWM2 channel4"
+            if BSP_USING_PWM1
+                config BSP_USING_PWM1_CH1
+                    bool "Enable PWM1 channel1"
+                    default n
+                config BSP_USING_PWM1_CH2
+                    bool "Enable PWM1 channel2"
+                    default n
+                config BSP_USING_PWM1_CH3
+                    bool "Enable PWM1 channel3"
                     default n
             endif
         endif

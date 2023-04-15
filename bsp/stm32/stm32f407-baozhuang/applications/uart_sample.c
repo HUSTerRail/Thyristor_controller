@@ -28,6 +28,14 @@ static rt_err_t uart_input(rt_device_t dev, rt_size_t size)
     return RT_EOK;
 }
 
+extern int adc_voltage[7];  //要发送的模拟量的值
+uint16_t voltage_recv = 0;  //电压接收值
+uint16_t current_recv = 0;  //电流设定值
+uint8_t percentage_recv = 0;  //百分比
+extern int run_record;
+extern int voltage_set,current_set,percentage_set;  //设定值
+extern void para_write();
+
 //Addr. SER对应串口访问寄存器的ROM地址，ADDR代表串口对应MU150的RAM地址
 static void serial_thread_entry(void *parameter)
 {
@@ -42,7 +50,53 @@ static void serial_thread_entry(void *parameter)
             rt_sem_take(&rx_sem, RT_WAITING_FOREVER);
         }
         /* 读取到的数据通过串口错位输出 */
-				
+				if(ch == 0x00) //代表上位机要读取从机的7路AD数值
+				{
+					//发送的格式为先发送AD0~AD6的高8位，再发送低8位
+					for(int i = 0;i < 7;i++){
+							ch = (((unsigned char)adc_voltage[i]) & 0xff00) >> 8;
+							rt_device_write(serial, 0, &ch, 1);
+							ch = ((unsigned char)adc_voltage[i]) & 0x00ff;
+							rt_device_write(serial, 0, &ch, 1);
+					}
+				}
+				int start = 0;  //表示上位机开始传输控制指令
+				if(ch == 0x02 && start == 0)  //代表上位机要发送指定的电压值，电流值和比例（默认为100％）
+				{
+						start = 1;
+				}
+				if(start == 1) //开始接收电压高8位
+				{
+						voltage_recv = ch<<8;
+						start++;
+				}
+				if(start == 2) //开始接收电压低8位
+				{
+						voltage_recv += ch;
+						start++;
+				}
+				if(start == 3) //开始接收电流高8位
+				{
+						current_recv = ch<<8;
+						start++;
+				}
+				if(start == 4) //开始接收电流低8位
+				{
+						current_recv += ch;
+						start++;
+				}
+				if(start == 5) //开始接收百分比
+				{
+						percentage_recv = ch;
+						start = 0;
+						if(run_record == 0) //如果还没启动
+						{
+								voltage_set = voltage_recv;
+								current_set = current_recv;
+								percentage_set = percentage_recv;
+								para_write(); //数据存储
+						}
+				}
     }
 }
 

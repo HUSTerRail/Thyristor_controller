@@ -107,6 +107,7 @@
 #define RT_USING_HWTIMER
 #define RT_USING_PIN
 #define RT_USING_ADC
+#define RT_USING_PWM
 #define RT_USING_SPI
 #define RT_USING_SFUD
 #define RT_SFUD_USING_SFDP
@@ -299,8 +300,6 @@
 /* On-chip Peripheral Drivers */
 
 #define BSP_USING_GPIO
-#define BSP_USING_PWM
-#define BSP_USING_PWM1
 #define BSP_USING_UART
 #define BSP_USING_UART1
 #define BSP_USING_UART2
@@ -312,6 +311,11 @@
 #define BSP_USING_TIM
 #define BSP_USING_TIM11
 #define BSP_USING_TIM14
+#define BSP_USING_PWM
+#define BSP_USING_PWM1
+#define BSP_USING_PWM1_CH1
+#define BSP_USING_PWM1_CH2
+#define BSP_USING_PWM1_CH3
 #define BSP_USING_ON_CHIP_FLASH
 #define BSP_USING_SPI
 #define BSP_USING_SPI1

@@ -29,6 +29,10 @@ static void read_knob_vol_entry(void *parameter)
 		for(int i = 0;i < 7;i++){  //使能ADC1通道0~6
 			rt_adc_enable(adc_dev, i);
 		}
+		extern int voltage_set;
+		extern int pwm1_end;
+		extern int pwm1_status[4];
+		extern struct rt_semaphore pwm1_sem;
     while (1)
     {
         /* rt_adc_read(adc_dev, i)读取采样值 */
@@ -40,6 +44,12 @@ static void read_knob_vol_entry(void *parameter)
 				for(int i = 0;i < 7;i++){
         adc_voltage[i] = (int32_t)(( adc_voltage[i] * filter_factor ) + ( 1 - filter_factor ) * last_voltage[i]); //计算
 				last_voltage[i] = adc_voltage[i];                                     //存贮本次数据
+				}
+				for(int i = 2;i <= 4;i++){  //为U、V、W电压，检测是否到达设定电压值。
+						if(adc_voltage[i] >= voltage_set && pwm1_status[i-1]){  //达到电压值且处于PWM通道处于打开状态
+								pwm1_end = i - 1;  //代表关闭通道i-1
+								rt_sem_release(&pwm1_sem);
+						}
 				}
         rt_thread_mdelay(5);  //线程里面需要有延时函数
     }

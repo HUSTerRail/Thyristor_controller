@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER, STM32F407xx, RT_USING_ARM_LIBC</Define>
               <Undefine></Undefine>
-              <IncludePath>applications;.;packages\CmBacktrace-v1.4.0;..\..\..\libcpu\arm\cortex-m4;..\..\..\libcpu\arm\common;..\..\..\components\drivers\include;..\..\..\components\drivers\hwcrypto;.;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\spi;..\..\..\components\drivers\include;..\..\..\components\drivers\spi\sfud\inc;..\..\..\components\drivers\include;..\..\..\components\drivers\include;board;board\CubeMX_Config\Inc;board\ports;..\libraries\HAL_Drivers;..\libraries\HAL_Drivers\config;..\libraries\HAL_Drivers\drv_flash;..\..\..\components\dfs\include;..\..\..\components\dfs\filesystems\devfs;..\..\..\components\dfs\filesystems\elmfat;..\..\..\components\finsh;.;..\..\..\include;..\..\..\components\libc\compilers\armlibc;..\..\..\components\libc\compilers\common;..\..\..\components\libc\termios;packages\libmodbus-latest\examples;packages\libmodbus-latest\inc;..\..\..\components\net\lwip-2.0.2\src;..\..\..\components\net\lwip-2.0.2\src\include;..\..\..\components\net\lwip-2.0.2\src\include\ipv4;..\..\..\components\net\lwip-2.0.2\src\arch\include;..\..\..\components\net\lwip-2.0.2\src\include\netif;..\..\..\components\net\lwip-2.0.2\src\include\posix;..\..\..\components\net\netdev\include;..\..\..\components\drivers\usb\usbhost;..\..\..\components\drivers\usb\usbhost\class;..\..\..\components\drivers\usb\usbhost\core;..\..\..\components\drivers\usb\usbhost\include;..\..\..\components\drivers\include;packages\state_machine-latest\examples;packages\state_machine-latest\inc;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\libraries\STM32F4xx_HAL\CMSIS\Include;..\..\..\components\utilities\ulog;..\..\..\components\utilities\ymodem;..\..\..\components\drivers\include\drivers</IncludePath>
+              <IncludePath>applications;.;packages\CmBacktrace-v1.4.0;..\..\..\libcpu\arm\cortex-m4;..\..\..\libcpu\arm\common;..\..\..\components\drivers\include;..\..\..\components\drivers\hwcrypto;.;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\spi;..\..\..\components\drivers\include;..\..\..\components\drivers\spi\sfud\inc;..\..\..\components\drivers\include;..\..\..\components\drivers\include;board;board\CubeMX_Config\Inc;board\ports;..\libraries\HAL_Drivers;..\libraries\HAL_Drivers\config;..\libraries\HAL_Drivers\drv_flash;..\..\..\components\dfs\include;..\..\..\components\dfs\filesystems\devfs;..\..\..\components\dfs\filesystems\elmfat;..\..\..\components\finsh;.;..\..\..\include;..\..\..\components\libc\compilers\armlibc;..\..\..\components\libc\compilers\common;..\..\..\components\libc\termios;packages\libmodbus-latest\examples;packages\libmodbus-latest\inc;..\..\..\components\net\lwip-2.0.2\src;..\..\..\components\net\lwip-2.0.2\src\include;..\..\..\components\net\lwip-2.0.2\src\include\ipv4;..\..\..\components\net\lwip-2.0.2\src\arch\include;..\..\..\components\net\lwip-2.0.2\src\include\netif;..\..\..\components\net\lwip-2.0.2\src\include\posix;..\..\..\components\net\netdev\include;..\..\..\components\drivers\usb\usbhost;..\..\..\components\drivers\usb\usbhost\class;..\..\..\components\drivers\usb\usbhost\core;..\..\..\components\drivers\usb\usbhost\include;..\..\..\components\drivers\include;packages\state_machine-latest\examples;packages\state_machine-latest\inc;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\libraries\STM32F4xx_HAL\CMSIS\Include;..\..\..\components\utilities\ulog;..\..\..\components\utilities\ymodem</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -389,14 +389,19 @@
               <FilePath>applications\main.c</FilePath>
             </File>
             <File>
-              <FileName>uart_sample.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\uart_sample.c</FilePath>
-            </File>
-            <File>
               <FileName>AD_read.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\applications\AD_read.c</FilePath>
+              <FilePath>applications\AD_read.c</FilePath>
+            </File>
+            <File>
+              <FileName>PWM_sample.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\PWM_sample.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart_sample.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\uart_sample.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -617,6 +622,11 @@
               <FilePath>..\..\..\components\drivers\misc\adc.c</FilePath>
             </File>
             <File>
+              <FileName>rt_drv_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\drivers\misc\rt_drv_pwm.c</FilePath>
+            </File>
+            <File>
               <FileName>pulse_encoder.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\components\drivers\misc\pulse_encoder.c</FilePath>
@@ -691,11 +701,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\components\drivers\watchdog\watchdog.c</FilePath>
             </File>
-            <File>
-              <FileName>dac.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\misc\dac.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -740,6 +745,11 @@
               <FileName>drv_hwtimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\libraries\HAL_Drivers\drv_hwtimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\HAL_Drivers\drv_pwm.c</FilePath>
             </File>
             <File>
               <FileName>drv_spi.c</FileName>

@@ -13,11 +13,45 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <definitions.h>
-
+#include <dfs_fs.h>
+#include <dfs_posix.h> /* 当需要使用文件操作时，需要包含这个头文件 */
 
 /* defined the LED0 pin: PG1 */
 #define LED0_PIN    GET_PIN(G, 1)
 
+int voltage_set = 0,current_set = 0,percentage_set = 0; //存储的电压、电流、百分比的值。
+void para_read(){   //从W25Q64中读取数据
+  int fd, size;
+	uint8_t params[5] = {0};  
+	fd = open("/params.dat", O_RDONLY | O_BINARY);
+	if(fd >= 0){	//读取成功
+			size = read(fd, params, sizeof(params));
+			close(fd);	
+			voltage_set = (params[0]<<8) + params[1];
+			current_set = (params[2]<<8) + params[3];
+			percentage_set = params[4];
+	}
+	else{  //读取失败
+			voltage_set = 0;
+			current_set = 0;
+			percentage_set = 0;
+	}
+}
+
+void para_write(){   //向W25Q64中写入数据
+  int fd;
+	uint8_t params[5] = {0};
+	params[0] = (((uint16_t)voltage_set) & 0xff00)>>8; //电压高8位
+	params[1] = (((uint16_t)voltage_set) & 0x00ff);    //电压低8位
+	params[2] = (((uint16_t)current_set) & 0xff00)>>8;
+	params[3] = (((uint16_t)current_set) & 0x00ff);
+	params[4] = (((uint16_t)percentage_set) & 0xff);
+	fd = open("/params.dat", O_RDONLY | O_BINARY);
+	if(fd >= 0){	//读取成功
+			write(fd, params, sizeof(params));
+			close(fd);	
+	}	
+}
 
 int main(void)
 {
@@ -35,6 +69,62 @@ int main(void)
     return RT_EOK;
 }
 
+int run_record = 0; //启动标志位
+int pwm1_status[4] = {0};  //代表当前pwm通道的开关状态，1代表导通，0代表关闭,pwm1_status[1]代表通道1
+extern int pwm1_start; 
+extern struct rt_semaphore pwm1_sem;
+
+void PHASE_U_cb(){  //中断回调函数
+	if(run_record == 1 && pwm1_status[1] == 0){
+		pwm1_start = 1;  //代表打开通道1 
+		rt_sem_release(&pwm1_sem);
+	}
+}
+
+void PHASE_V_cb(){
+	if(run_record == 1 && pwm1_status[2] == 0){
+		pwm1_start = 2;  //代表打开通道2 
+		rt_sem_release(&pwm1_sem);
+	}	
+}
+
+void PHASE_W_cb(){
+	if(run_record == 1 && pwm1_status[3] == 0){
+		pwm1_start = 3;  //代表打开通道3
+		rt_sem_release(&pwm1_sem);
+	}	
+}
+
+void PHASE_U_isr(void *args)   //U引脚变化会触发本中断处理函数。
+{
+	static int32_t last_tick = 0;
+	int32_t tick = rt_tick_get();
+		if(tick - last_tick > 3 || tick - last_tick < -3){   //进行消抖的相关配置，剔除大于3个tick的响应。
+			PHASE_U_cb();                               
+		}
+		last_tick = tick;
+}
+
+void PHASE_V_isr(void *args)   //V引脚变化会触发本中断处理函数。
+{
+	static int32_t last_tick = 0;
+	int32_t tick = rt_tick_get();
+		if(tick - last_tick > 3 || tick - last_tick < -3){   //进行消抖的相关配置，剔除大于3个tick的响应。
+			PHASE_V_cb();                               
+		}
+		last_tick = tick;
+}
+
+void PHASE_W_isr(void *args)   //W引脚变化会触发本中断处理函数。
+{
+	static int32_t last_tick = 0;
+	int32_t tick = rt_tick_get();
+		if(tick - last_tick > 3 || tick - last_tick < -3){   //进行消抖的相关配置，剔除大于3个tick的响应。
+			PHASE_W_cb();                               
+		}
+		last_tick = tick;
+}
+
 int pin_setting(){
 		//设置输入引脚为上拉输入
 		rt_pin_mode(GPIO_PHASE_U, PIN_MODE_INPUT_PULLUP);
@@ -44,7 +134,12 @@ int pin_setting(){
 		rt_pin_mode(GPIO_MI2, PIN_MODE_INPUT_PULLUP);	
 		//设置引脚为输出模式
 		rt_pin_mode(GPIO_MO1, PIN_MODE_OUTPUT);
-		
+			
+		//设置U,V,W为中断触(上升沿下降沿都触发的方式)
+		rt_pin_attach_irq(GPIO_PHASE_U, PIN_IRQ_MODE_RISING_FALLING, PHASE_U_isr, 0); 
+		rt_pin_attach_irq(GPIO_PHASE_V, PIN_IRQ_MODE_RISING_FALLING, PHASE_V_isr, 0); 
+		rt_pin_attach_irq(GPIO_PHASE_W, PIN_IRQ_MODE_RISING_FALLING, PHASE_W_isr, 0); 
+	
 		rt_pin_write(GPIO_MO1, 1);
 		return 0;
 }
@@ -71,6 +166,8 @@ void gpio_entry(void *parameters)
     rt_tick_t sensor_tick = rt_tick_get();  //获取当前的tick时间	
 		for (;;)   //一直处于for循环之中，时刻获取所有输入引脚的电位
 		{
+				if(gpio_port.input.bit4 == 0 && gpio_port.input.bit5 == 1)  //代表启动
+						run_record = 1;
         do
         {
 						port_pre.input.word = port_in.input.word;
