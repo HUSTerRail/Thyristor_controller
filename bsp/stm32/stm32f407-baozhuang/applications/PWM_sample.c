@@ -53,7 +53,7 @@ int pwm_led_sample()
     }
     /* 设置PWM周期和脉冲宽度默认值 */
 		for(int i = 1;i < 4;i++)  //3路脉冲
-    rt_pwm_set(pwm_dev, i, period, pulse);
+    rt_pwm_set(pwm_dev, i, period*2, period*2 - pulse);
 
 		rt_err_t ret = RT_EOK;
     /* 创建 PWM输出 线程 */

@@ -60,7 +60,10 @@ int main(void)
 		para_read();
 		para_write();
 		read_knob_vol_thread();
+		extern void MX_TIM1_Init(void);
+		MX_TIM1_Init();
 		pwm_led_sample();
+		
     /* set LED0 pin mode to output */
     rt_pin_mode(LED0_PIN, PIN_MODE_OUTPUT);
     while (count++)

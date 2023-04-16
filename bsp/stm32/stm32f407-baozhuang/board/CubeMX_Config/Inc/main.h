@@ -110,8 +110,6 @@ void Error_Handler(void);
 #define GPIO_MI9_GPIO_Port GPIOF
 #define GPIO_MI11_Pin GPIO_PIN_10
 #define GPIO_MI11_GPIO_Port GPIOF
-#define X_LABEL_Pin GPIO_PIN_3
-#define X_LABEL_GPIO_Port GPIOA
 #define BOOT1_Pin GPIO_PIN_2
 #define BOOT1_GPIO_Port GPIOB
 #define GPIO_MI12_Pin GPIO_PIN_11

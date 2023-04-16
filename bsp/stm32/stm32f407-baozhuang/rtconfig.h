@@ -309,6 +309,7 @@
 #define BSP_USING_CAN1
 #define BSP_USING_CAN2
 #define BSP_USING_TIM
+//#define BSP_USING_TIM1
 #define BSP_USING_TIM11
 #define BSP_USING_TIM14
 #define BSP_USING_PWM
