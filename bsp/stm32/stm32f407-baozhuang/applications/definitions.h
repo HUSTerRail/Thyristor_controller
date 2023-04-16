@@ -11,7 +11,8 @@
 #pragma anon_unions
 
 //零点检测IO输入
-#define GPIO_PHASE_U	GET_PIN(A, 15)   
+//#define GPIO_PHASE_U	GET_PIN(A, 15)   
+#define GPIO_PHASE_U	GET_PIN(F, 0) 
 #define GPIO_PHASE_V	GET_PIN(B, 3) 
 #define GPIO_PHASE_W	GET_PIN(B, 15) 
 
@@ -61,5 +62,6 @@ typedef struct _gpio_port {
 		};
 	}input;    //所有的输入引脚
 } GPIO_Port;
-
+int read_knob_vol_thread(void);
+int pwm_led_sample();
 #endif /* APPLICATIONS_DEFINITIONS_H_ */

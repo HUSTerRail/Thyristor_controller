@@ -4,7 +4,7 @@
 
 //AI1:ADC1_IN0、AI2:ADC1_IN8
 #define ADC_DEV_NAME        "adc1"      /* ADC 设备名称 AS1+*/
-#define REFER_VOLTAGE       330         /* 参考电压330V,数据精度乘以10保留1位小数*/
+#define REFER_VOLTAGE       1000         /* 参考电压10V,数据精度乘以100保留2位小数*/
 #define CONVERT_BITS        (1 << 12)   /* 转换位数为12位 */
 
 #define THREAD_PRIORITY         25
@@ -45,12 +45,12 @@ static void read_knob_vol_entry(void *parameter)
         adc_voltage[i] = (int32_t)(( adc_voltage[i] * filter_factor ) + ( 1 - filter_factor ) * last_voltage[i]); //计算
 				last_voltage[i] = adc_voltage[i];                                     //存贮本次数据
 				}
-				for(int i = 2;i <= 4;i++){  //为U、V、W电压，检测是否到达设定电压值。
-						if(adc_voltage[i] >= voltage_set && pwm1_status[i-1]){  //达到电压值且处于PWM通道处于打开状态
-								pwm1_end = i - 1;  //代表关闭通道i-1
-								rt_sem_release(&pwm1_sem);
-						}
-				}
+//				for(int i = 2;i <= 4;i++){  //为U、V、W电压，检测是否到达设定电压值。
+//						if(adc_voltage[i] >= voltage_set && pwm1_status[i-1]){  //达到电压值且处于PWM通道处于打开状态
+//								pwm1_end = i - 1;  //代表关闭通道i-1
+//								rt_sem_release(&pwm1_sem);
+//						}
+//				}
         rt_thread_mdelay(5);  //线程里面需要有延时函数
     }
 }

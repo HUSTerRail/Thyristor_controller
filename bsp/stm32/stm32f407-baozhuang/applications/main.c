@@ -23,7 +23,7 @@ int voltage_set = 0,current_set = 0,percentage_set = 0; //存储的电压、电流、百分
 void para_read(){   //从W25Q64中读取数据
   int fd, size;
 	uint8_t params[5] = {0};  
-	fd = open("/params.dat", O_RDONLY | O_BINARY);
+	fd = open("/params.dat", O_WRONLY | O_CREAT);
 	if(fd >= 0){	//读取成功
 			size = read(fd, params, sizeof(params));
 			close(fd);	
@@ -41,12 +41,13 @@ void para_read(){   //从W25Q64中读取数据
 void para_write(){   //向W25Q64中写入数据
   int fd;
 	uint8_t params[5] = {0};
-	params[0] = (((uint16_t)voltage_set) & 0xff00)>>8; //电压高8位
-	params[1] = (((uint16_t)voltage_set) & 0x00ff);    //电压低8位
-	params[2] = (((uint16_t)current_set) & 0xff00)>>8;
-	params[3] = (((uint16_t)current_set) & 0x00ff);
-	params[4] = (((uint16_t)percentage_set) & 0xff);
-	fd = open("/params.dat", O_RDONLY | O_BINARY);
+//	params[0] = (((uint16_t)voltage_set) & 0xff00)>>8; //电压高8位
+//	params[1] = (((uint16_t)voltage_set) & 0x00ff);    //电压低8位
+//	params[2] = (((uint16_t)current_set) & 0xff00)>>8;
+//	params[3] = (((uint16_t)current_set) & 0x00ff);
+//	params[4] = (((uint16_t)percentage_set) & 0xff);
+	params[0] = 0x11;
+	fd = open("/params.dat", O_WRONLY);
 	if(fd >= 0){	//读取成功
 			write(fd, params, sizeof(params));
 			close(fd);	
@@ -56,6 +57,10 @@ void para_write(){   //向W25Q64中写入数据
 int main(void)
 {
     int count = 1;
+		para_read();
+		para_write();
+		read_knob_vol_thread();
+		pwm_led_sample();
     /* set LED0 pin mode to output */
     rt_pin_mode(LED0_PIN, PIN_MODE_OUTPUT);
     while (count++)
@@ -166,6 +171,7 @@ void gpio_entry(void *parameters)
     rt_tick_t sensor_tick = rt_tick_get();  //获取当前的tick时间	
 		for (;;)   //一直处于for循环之中，时刻获取所有输入引脚的电位
 		{
+				run_record = 1;  //测试专用
 				if(gpio_port.input.bit4 == 0 && gpio_port.input.bit5 == 1)  //代表启动
 						run_record = 1;
         do

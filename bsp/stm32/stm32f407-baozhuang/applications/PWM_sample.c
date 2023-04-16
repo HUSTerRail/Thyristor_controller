@@ -14,6 +14,8 @@ int pwm1_start = 0,pwm1_end = 0; //pwm1_start = 1代表要开启通道1，pwm1_e
 
 extern int pwm1_status[4];
 void pwm_thread_entry(void *parameter){
+		rt_pwm_enable(pwm_dev, 1);
+		rt_pwm_enable(pwm_dev, 2);	
 		while(1){
 				rt_sem_take(&pwm1_sem, RT_WAITING_FOREVER);
 				if(pwm1_start != 0){   //代表要启动PWM通道
@@ -39,8 +41,8 @@ int pwm_led_sample()
 	
     rt_uint32_t period, pulse;
 
-    period = 500000;    /* 周期为0.5ms，单位为纳秒ns */
-    pulse = 0;          /* PWM脉冲宽度值，单位为纳秒ns */
+    period = 10000000;    /* 周期为10ms，单位为纳秒ns */
+    pulse = 1000000;     /* PWM脉冲宽度值1ms，单位为纳秒ns */
 
     /* 查找设备 */
     pwm_dev = (struct rt_device_pwm *)rt_device_find(PWM_DEV_NAME);
