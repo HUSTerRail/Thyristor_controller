@@ -1,6 +1,7 @@
 #include <rtthread.h>
 #include "rtdevice.h"
 #include <ulog.h>
+#include <definitions.h>
 
 //AI1:ADC1_IN0、AI2:ADC1_IN8
 #define ADC_DEV_NAME        "adc1"      /* ADC 设备名称 AS1+*/
@@ -13,9 +14,10 @@
 static rt_thread_t tid1 = RT_NULL;
 int adc_voltage[7] = {0};
 int last_voltage[7] = {0};
+int percentage_change = 0; //百分比切换标志位，若该标志位为1，代表通道1的percentage发生改变
 
 /* 获取电压的范围：0V~21V ，单位0.1V*/
-static void read_knob_vol_entry(void *parameter)
+void read_knob_vol_entry(void *parameter)
 {
     rt_adc_device_t adc_dev;
     float filter_factor = 0.1;  //滤波系数
@@ -33,6 +35,10 @@ static void read_knob_vol_entry(void *parameter)
 		extern int pwm1_end;
 		extern int pwm1_status[4];
 		extern struct rt_semaphore pwm1_sem;
+		extern int percentage_set;
+		extern int run_record;
+		int voltage_percentage_table[2][20] = {{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100},
+																					{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100}};  //电压和速比的对照表
     while (1)
     {
         /* rt_adc_read(adc_dev, i)读取采样值 */
@@ -45,12 +51,22 @@ static void read_knob_vol_entry(void *parameter)
         adc_voltage[i] = (int32_t)(( adc_voltage[i] * filter_factor ) + ( 1 - filter_factor ) * last_voltage[i]); //计算
 				last_voltage[i] = adc_voltage[i];                                     //存贮本次数据
 				}
-//				for(int i = 2;i <= 4;i++){  //为U、V、W电压，检测是否到达设定电压值。
-//						if(adc_voltage[i] >= voltage_set && pwm1_status[i-1]){  //达到电压值且处于PWM通道处于打开状态
-//								pwm1_end = i - 1;  //代表关闭通道i-1
-//								rt_sem_release(&pwm1_sem);
-//						}
-//				}
+				if(run_record == 1){
+					for(int i = 2;i <= 4;i++){  //为U、V、W电压，检测是否到达设定电压值。
+							if(adc_voltage[i] >= voltage_set && pwm1_status[i-1]){  //达到电压值且处于PWM通道处于打开状态
+									pwm1_end = i - 1;  //代表关闭通道i-1
+									rt_sem_release(&pwm1_sem);
+							}
+							for(int j = 0;j < 19;j++){
+									if(adc_voltage[i] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
+									{
+											percentage_set = voltage_percentage_table[1][j+1];
+											percentage_change = i - 1;
+											break;
+									}
+							}
+					}
+				}
         rt_thread_mdelay(5);  //线程里面需要有延时函数
     }
 }

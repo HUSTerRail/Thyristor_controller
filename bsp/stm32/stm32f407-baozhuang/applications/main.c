@@ -19,7 +19,7 @@
 /* defined the LED0 pin: PG1 */
 #define LED0_PIN    GET_PIN(G, 1)
 
-int voltage_set = 0,current_set = 0,percentage_set = 0; //存储的电压、电流、百分比的值。
+int voltage_set = 0,current_set = 0; //存储的电压、电流的值。
 void para_read(){   //从W25Q64中读取数据
   int fd, size;
 	uint8_t params[5] = {0};  
@@ -29,24 +29,20 @@ void para_read(){   //从W25Q64中读取数据
 			close(fd);	
 			voltage_set = (params[0]<<8) + params[1];
 			current_set = (params[2]<<8) + params[3];
-			percentage_set = params[4];
 	}
 	else{  //读取失败
 			voltage_set = 0;
 			current_set = 0;
-			percentage_set = 0;
 	}
 }
 
 void para_write(){   //向W25Q64中写入数据
   int fd;
-	uint8_t params[5] = {0};
-//	params[0] = (((uint16_t)voltage_set) & 0xff00)>>8; //电压高8位
-//	params[1] = (((uint16_t)voltage_set) & 0x00ff);    //电压低8位
-//	params[2] = (((uint16_t)current_set) & 0xff00)>>8;
-//	params[3] = (((uint16_t)current_set) & 0x00ff);
-//	params[4] = (((uint16_t)percentage_set) & 0xff);
-	params[0] = 0x11;
+	uint8_t params[4] = {0};
+	params[0] = (((uint16_t)voltage_set) & 0xff00)>>8; //电压高8位
+	params[1] = (((uint16_t)voltage_set) & 0x00ff);    //电压低8位
+	params[2] = (((uint16_t)current_set) & 0xff00)>>8;
+	params[3] = (((uint16_t)current_set) & 0x00ff);
 	fd = open("/params.dat", O_WRONLY);
 	if(fd >= 0){	//读取成功
 			write(fd, params, sizeof(params));
@@ -81,23 +77,27 @@ int run_record = 0; //启动标志位
 int pwm1_status[4] = {0};  //代表当前pwm通道的开关状态，1代表导通，0代表关闭,pwm1_status[1]代表通道1
 extern int pwm1_start; 
 extern struct rt_semaphore pwm1_sem;
+extern int percentage_change; //百分比切换标志位，若该标志位为1，代表通道1的percentage发生改变
 
 void PHASE_U_cb(){  //中断回调函数
-	if(run_record == 1 && pwm1_status[1] == 0){
+	if((run_record == 1 && pwm1_status[1] == 0) || percentage_change == 1){
+		percentage_change = 0;
 		pwm1_start = 1;  //代表打开通道1 
 		rt_sem_release(&pwm1_sem);
 	}
 }
 
 void PHASE_V_cb(){
-	if(run_record == 1 && pwm1_status[2] == 0){
+	if((run_record == 1 && pwm1_status[2] == 0) || percentage_change == 2){
+		percentage_change = 0;
 		pwm1_start = 2;  //代表打开通道2 
 		rt_sem_release(&pwm1_sem);
 	}	
 }
 
 void PHASE_W_cb(){
-	if(run_record == 1 && pwm1_status[3] == 0){
+	if((run_record == 1 && pwm1_status[3] == 0) || percentage_change == 3){
+		percentage_change = 0;
 		pwm1_start = 3;  //代表打开通道3
 		rt_sem_release(&pwm1_sem);
 	}	
@@ -147,6 +147,9 @@ int pin_setting(){
 		rt_pin_attach_irq(GPIO_PHASE_U, PIN_IRQ_MODE_RISING_FALLING, PHASE_U_isr, 0); 
 		rt_pin_attach_irq(GPIO_PHASE_V, PIN_IRQ_MODE_RISING_FALLING, PHASE_V_isr, 0); 
 		rt_pin_attach_irq(GPIO_PHASE_W, PIN_IRQ_MODE_RISING_FALLING, PHASE_W_isr, 0); 
+    rt_pin_irq_enable(GPIO_PHASE_U,1);   //使能3个中断
+    rt_pin_irq_enable(GPIO_PHASE_V,1);
+    rt_pin_irq_enable(GPIO_PHASE_W,1);
 	
 		rt_pin_write(GPIO_MO1, 1);
 		return 0;
@@ -174,7 +177,6 @@ void gpio_entry(void *parameters)
     rt_tick_t sensor_tick = rt_tick_get();  //获取当前的tick时间	
 		for (;;)   //一直处于for循环之中，时刻获取所有输入引脚的电位
 		{
-				run_record = 1;  //测试专用
 				if(gpio_port.input.bit4 == 0 && gpio_port.input.bit5 == 1)  //代表启动
 						run_record = 1;
         do
@@ -186,7 +188,6 @@ void gpio_entry(void *parameters)
             {
                 rt_thread_mdelay(1);
             }
-
         }
         while (!stabled);
 
@@ -217,3 +218,32 @@ static int gpio_thread_init(void)  //初始化gpio
     return RT_EOK;
 }
 INIT_APP_EXPORT(gpio_thread_init);
+
+int count = 0;
+rt_err_t control_hwtimer_cb(rt_device_t dev, rt_size_t size) //定时器的callback函数主要是进行状态机状态转换的响应(在其中调用发送脉冲的函数)
+{
+		count++;
+    return 0;
+}
+
+static int timer14_init(void){  //初始化定时器14
+	rt_err_t ret = RT_EOK;
+	rt_hwtimerval_t timeout_s; /* 定时器超时值 */
+	rt_device_t hw_dev = RT_NULL; /* 定时器设备句柄 */
+	rt_hwtimer_mode_t mode; /* 定时器模式 */
+	hw_dev = rt_device_find("timer14");
+	RT_ASSERT(hw_dev != RT_NULL)
+	ret = rt_device_open(hw_dev, RT_DEVICE_OFLAG_RDWR);
+	RT_ASSERT(ret == RT_EOK)
+	rt_device_set_rx_indicate(hw_dev, control_hwtimer_cb);
+	mode = HWTIMER_MODE_PERIOD;
+	ret = rt_device_control(hw_dev, HWTIMER_CTRL_MODE_SET, &mode);
+	RT_ASSERT(ret == RT_EOK);
+	timeout_s.sec = 0;
+	timeout_s.usec = 100;  //0.1ms调用1次中断回调函数
+	if (rt_device_write(hw_dev, 0, &timeout_s, sizeof(timeout_s))
+			!= sizeof(timeout_s)) {
+		RT_ASSERT(0);
+	}
+}
+INIT_APP_EXPORT(timer14_init);

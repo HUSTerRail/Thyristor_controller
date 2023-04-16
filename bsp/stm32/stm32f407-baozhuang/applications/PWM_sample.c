@@ -4,6 +4,8 @@
 
 #include <rtthread.h>
 #include <rtdevice.h>
+#include <definitions.h>
+#include <board.h>
 
 #define PWM_DEV_NAME        "pwm1"  /* PWM设备名称 */
 
@@ -11,15 +13,20 @@ struct rt_device_pwm *pwm_dev;      /* PWM设备句柄 */
 /* 用于PWM的信号量 */
 struct rt_semaphore pwm1_sem;
 int pwm1_start = 0,pwm1_end = 0; //pwm1_start = 1代表要开启通道1，pwm1_end = 1代表关闭通道1
+int percentage_set = 5;  //百分比设定，最开始按照百分之5去充电
+rt_uint32_t period, pulse;
+extern int count;//定时器计数值，定时器定时时间为0.1ms
 
 extern int pwm1_status[4];
+extern int run_record;
 void pwm_thread_entry(void *parameter){
-		rt_pwm_enable(pwm_dev, 1);
-		rt_pwm_enable(pwm_dev, 2);	
 		while(1){
 				rt_sem_take(&pwm1_sem, RT_WAITING_FOREVER);
 				if(pwm1_start != 0){   //代表要启动PWM通道
 					/* 使能通道 */
+					rt_pwm_disable(pwm_dev, pwm1_start);  //先关闭通道
+					count = 0;
+					while(count <= period/100000 *(100 - percentage_set)/100); //等待百分比延时时间后启动PWM通道
 					rt_pwm_enable(pwm_dev, pwm1_start);	
 					pwm1_status[pwm1_start] = 1;
 					pwm1_start = 0;
@@ -30,6 +37,13 @@ void pwm_thread_entry(void *parameter){
 					rt_pwm_disable(pwm_dev, pwm1_start);
 					pwm1_status[pwm1_start] = 0;
 					pwm1_end = 0;
+					if(pwm1_status[1] == 0 && pwm1_status[2] == 0 && pwm1_status[3] == 0)  //如果三个通道都关闭的话，代表充电完成
+					{
+							run_record  = 0;
+							rt_pin_write(GPIO_MO1,0); //继电器输出
+							rt_thread_mdelay(1000);   //适当延时1S
+							rt_pin_write(GPIO_MO1,1); //继电器停止输出
+					}
 				}
 		}
 }
@@ -38,8 +52,6 @@ int pwm_led_sample()
 {
 		/* 初始化信号量 */
     rt_sem_init(&pwm1_sem, "pwm1_sem", 0, RT_IPC_FLAG_FIFO);
-	
-    rt_uint32_t period, pulse;
 
     period = 10000000;    /* 周期为10ms，单位为纳秒ns */
     pulse = 1000000;     /* PWM脉冲宽度值1ms，单位为纳秒ns */
