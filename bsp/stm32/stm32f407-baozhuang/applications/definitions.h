@@ -62,5 +62,6 @@ typedef struct _gpio_port {
 	}input;    //所有的输入引脚
 } GPIO_Port;
 int read_knob_vol_thread(void);
-int pwm_led_sample();
+int pwm_led_sample(void);
+void para_write(void);
 #endif /* APPLICATIONS_DEFINITIONS_H_ */

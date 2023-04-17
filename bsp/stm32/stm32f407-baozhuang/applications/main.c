@@ -21,11 +21,11 @@
 
 int voltage_set = 0,current_set = 0; //存储的电压、电流的值。
 void para_read(){   //从W25Q64中读取数据
-  int fd, size;
+  int fd;
 	uint8_t params[5] = {0};  
 	fd = open("/params.dat", O_WRONLY | O_CREAT);
 	if(fd >= 0){	//读取成功
-			size = read(fd, params, sizeof(params));
+			read(fd, params, sizeof(params));
 			close(fd);	
 			voltage_set = (params[0]<<8) + params[1];
 			current_set = (params[2]<<8) + params[3];
@@ -36,7 +36,7 @@ void para_read(){   //从W25Q64中读取数据
 	}
 }
 
-void para_write(){   //向W25Q64中写入数据
+void para_write(void){   //向W25Q64中写入数据
   int fd;
 	uint8_t params[4] = {0};
 	params[0] = (((uint16_t)voltage_set) & 0xff00)>>8; //电压高8位
@@ -53,12 +53,11 @@ void para_write(){   //向W25Q64中写入数据
 int main(void)
 {
     int count = 1;
-		para_read();
-		para_write();
+		para_read();  //上电读取flash中的参数
 		read_knob_vol_thread();
 		extern void MX_TIM1_Init(void);
-		MX_TIM1_Init();
-		pwm_led_sample();
+		MX_TIM1_Init();  ///定时器1PWM模式初始化
+		pwm_led_sample(); 
 		
     /* set LED0 pin mode to output */
     rt_pin_mode(LED0_PIN, PIN_MODE_OUTPUT);
@@ -156,8 +155,8 @@ int pin_setting(){
 }
 
 GPIO_Port gpio_port;
-static GPIO_Port port_pre, port_in,port_last;
-static GPIO_Port port_last;
+static GPIO_Port port_pre, port_in;
+//static GPIO_Port port_last;
 #define ALARM_MIN_UPLOAD_TIME 1
 #define ALARM_MAX_UPLOAD_TIME 1000
 
@@ -199,7 +198,7 @@ void gpio_entry(void *parameters)
         {
             sensor_tick = rt_tick_get();
         }		
-        port_last = gpio_port;
+//        port_last = gpio_port;
 				rt_thread_mdelay(1);				
 		}
 }
@@ -245,5 +244,6 @@ static int timer14_init(void){  //初始化定时器14
 			!= sizeof(timeout_s)) {
 		RT_ASSERT(0);
 	}
+	return 0;
 }
 INIT_APP_EXPORT(timer14_init);

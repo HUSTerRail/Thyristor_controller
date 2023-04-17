@@ -34,7 +34,6 @@ uint16_t current_recv = 0;  //电流设定值
 uint8_t percentage_recv = 0;  //百分比
 extern int run_record;
 extern int voltage_set,current_set;  //设定值
-extern void para_write();
 
 //Addr. SER对应串口访问寄存器的ROM地址，ADDR代表串口对应MU150的RAM地址
 static void serial_thread_entry(void *parameter)

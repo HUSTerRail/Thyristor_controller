@@ -53,18 +53,23 @@ void read_knob_vol_entry(void *parameter)
 				}
 				if(run_record == 1){
 					for(int i = 2;i <= 4;i++){  //为U、V、W电压，检测是否到达设定电压值。
-							if(adc_voltage[i] >= voltage_set && pwm1_status[i-1]){  //达到电压值且处于PWM通道处于打开状态
-									pwm1_end = i - 1;  //代表关闭通道i-1
-									rt_sem_release(&pwm1_sem);
-							}
-							for(int j = 0;j < 19;j++){
-									if(adc_voltage[i] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
-									{
-											percentage_set = voltage_percentage_table[1][j+1];
-											percentage_change = i - 1;
-											break;
+							if(pwm1_status[i-1]){  //如果当前通道处于开通状态
+								if(adc_voltage[i] >= voltage_set){  //达到电压值且处于PWM通道处于打开状态
+										pwm1_end = i - 1;  //代表关闭通道i-1
+										rt_sem_release(&pwm1_sem);
+								}
+								if(percentage_set < 100)  //如果还未到达百分百速比
+								{
+									for(int j = 0;j < 19;j++){
+											if(adc_voltage[i] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
+											{
+													percentage_set = voltage_percentage_table[1][j+1];
+													percentage_change = i - 1;
+													break;
+											}
 									}
-							}
+								}
+						}
 					}
 				}
         rt_thread_mdelay(5);  //线程里面需要有延时函数
