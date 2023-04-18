@@ -28,7 +28,6 @@ void pwm_thread_entry(void *parameter){
 					count = 0;
 					while(count <= period/100000 *(100 - percentage_set)/100); //等待百分比延时时间后启动PWM通道
 					rt_pwm_set(pwm_dev, pwm1_start, period*2, pulse*2);  //设置脉宽为pulse，开始发送脉冲
-//					pwm1_status[pwm1_start] = 1;
 					pwm1_start = 0;
 				}
 				else   //代表要关闭所有PWM通道

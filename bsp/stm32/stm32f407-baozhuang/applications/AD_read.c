@@ -5,12 +5,12 @@
 
 //AI1:ADC1_IN0、AI2:ADC1_IN8
 #define ADC_DEV_NAME        "adc1"      /* ADC 设备名称 AS1+*/
-#define REFER_VOLTAGE       330         /* 参考电压10V,数据精度乘以100保留2位小数*/
 #define CONVERT_BITS        (1 << 12)   /* 转换位数为12位 */
 
 #define THREAD_PRIORITY         25
 #define THREAD_STACK_SIZE       512
 #define THREAD_TIMESLICE        5
+int REFER_VOLTAGE[7] = {330,330,330,330,330,330,330};   /* 参考电压330V,数据精度乘以100保留2位小数*/
 static rt_thread_t tid1 = RT_NULL;
 int adc_voltage[7] = {0};
 int last_voltage[7] = {0};
@@ -37,13 +37,13 @@ void read_knob_vol_entry(void *parameter)
 		extern int run_record;
 		//电压和速比的对照表
 		int voltage_percentage_table[2][20] = {{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100},   //电压
-																					{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100}};   //速比
+																					{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100}};   //导通百分比
     while (1)
     {
         /* rt_adc_read(adc_dev, i)读取采样值 */
         /* 并转换为对应电压值 */
 				for(int i = 0;i < 7;i++){
-					adc_voltage[i] = rt_adc_read(adc_dev, i) * REFER_VOLTAGE / CONVERT_BITS;
+					adc_voltage[i] = rt_adc_read(adc_dev, i) * REFER_VOLTAGE[i] / CONVERT_BITS;
 				}
         /* 将得到的电压值进行一阶低通滤波，去除毛刺和噪声 */
 				for(int i = 0;i < 7;i++){
@@ -51,23 +51,20 @@ void read_knob_vol_entry(void *parameter)
 				last_voltage[i] = adc_voltage[i];                                     //存贮本次数据
 				}
 				if(run_record == 1){
-						if(adc_voltage[1] >= 200){  //达到电压值且处于PWM通道处于打开状态
+						if(adc_voltage[1] >= voltage_set){  //达到电压值且处于PWM通道处于打开状态
 								rt_sem_release(&pwm1_sem);
 						}
-//						if(adc_voltage[1] >= voltage_set){  //达到电压值且处于PWM通道处于打开状态
-//								rt_sem_release(&pwm1_sem);
-//						}
-//						if(percentage_set < 100)  //如果还未到达百分百速比
-//						{
-//							for(int j = 0;j < 19;j++){
-//									if(adc_voltage[1] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
-//									{
-//											percentage_set = voltage_percentage_table[1][j+1];
-//											percentage_change = 3;  //需要进行三次改变，即三路电压都要改变
-//											break;
-//									}
-//							}
-//						}						
+						if(percentage_set < 100)  //如果还未到达百分百速比
+						{
+							for(int j = 0;j < 19;j++){
+									if(adc_voltage[1] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
+									{
+											percentage_set = voltage_percentage_table[1][j+1];
+											percentage_change = 3;  //需要进行三次改变，即三路电压都要改变
+											break;
+									}
+							}
+						}						
 				}								
         rt_thread_mdelay(1);  //线程里面需要有延时函数
     }

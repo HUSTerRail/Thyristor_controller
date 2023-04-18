@@ -13,7 +13,7 @@
 //零点检测IO输入
 #define GPIO_PHASE_U	GET_PIN(A, 15)  
 #define GPIO_PHASE_V	GET_PIN(B, 3) 
-#define GPIO_PHASE_W	GET_PIN(B, 15) 
+#define GPIO_PHASE_W	GET_PIN(B, 14) 
 
 //开关信号量输入
 #define GPIO_MI1	GET_PIN(F, 0)   
