@@ -63,7 +63,7 @@ int pwm_led_sample(void)
 		for(int i = 1;i < 4;i++)  //3路脉冲
 		{
 			rt_pwm_set(pwm_dev, i, period*2, 0);   //设置默认脉宽为0，为低电平
-				rt_pwm_enable(pwm_dev, i); //使能PWM通道
+			rt_pwm_enable(pwm_dev, i); //使能PWM通道
 		}
 
 		rt_err_t ret = RT_EOK;

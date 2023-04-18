@@ -5,7 +5,7 @@
 
 //AI1:ADC1_IN0、AI2:ADC1_IN8
 #define ADC_DEV_NAME        "adc1"      /* ADC 设备名称 AS1+*/
-#define REFER_VOLTAGE       1000         /* 参考电压10V,数据精度乘以100保留2位小数*/
+#define REFER_VOLTAGE       330         /* 参考电压10V,数据精度乘以100保留2位小数*/
 #define CONVERT_BITS        (1 << 12)   /* 转换位数为12位 */
 
 #define THREAD_PRIORITY         25
@@ -16,7 +16,7 @@ int adc_voltage[7] = {0};
 int last_voltage[7] = {0};
 int percentage_change = 0; //百分比切换标志位，若该标志位为1，代表通道1的percentage发生改变
 
-/* 获取电压的范围：0V~21V ，单位0.1V*/
+/* 获取电压的范围 V~V ，单位0.01V*/
 void read_knob_vol_entry(void *parameter)
 {
     rt_adc_device_t adc_dev;

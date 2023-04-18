@@ -88,58 +88,31 @@ extern int pwm1_start;
 extern struct rt_semaphore pwm1_sem;
 extern int percentage_change; //百分比切换标志位，若该标志位为1，代表通道1的percentage发生改变
 
-void PHASE_U_cb(){  //中断回调函数
+void PHASE_U_cb(void *args){  //中断回调函数
 	if((run_record == 1 && pwm1_status[1] == 0) || percentage_change == 3){
-		percentage_change--;
+		if(percentage_change == 3)
+				percentage_change--;
 		pwm1_start = 1;  //代表打开通道1 
 		rt_sem_release(&pwm1_sem);
 	}
 }
 
-void PHASE_V_cb(){
+void PHASE_V_cb(void *args){
 	if((run_record == 1 && pwm1_status[2] == 0) || percentage_change == 2){
-		percentage_change--;
+		if(percentage_change == 2)
+				percentage_change--;
 		pwm1_start = 2;  //代表打开通道2 
 		rt_sem_release(&pwm1_sem);
 	}	
 }
 
-void PHASE_W_cb(){
+void PHASE_W_cb(void *args){
 	if((run_record == 1 && pwm1_status[3] == 0) || percentage_change == 1){
-		percentage_change--;
+		if(percentage_change == 1)
+				percentage_change--;
 		pwm1_start = 3;  //代表打开通道3
 		rt_sem_release(&pwm1_sem);
 	}	
-}
-
-void PHASE_U_isr(void *args)   //U引脚变化会触发本中断处理函数。
-{
-	static int32_t last_tick = 0;
-	int32_t tick = rt_tick_get();
-		if(tick - last_tick > 3 || tick - last_tick < -3){   //进行消抖的相关配置，剔除大于3个tick的响应。
-			PHASE_U_cb();                               
-		}
-		last_tick = tick;
-}
-
-void PHASE_V_isr(void *args)   //V引脚变化会触发本中断处理函数。
-{
-	static int32_t last_tick = 0;
-	int32_t tick = rt_tick_get();
-		if(tick - last_tick > 3 || tick - last_tick < -3){   //进行消抖的相关配置，剔除大于3个tick的响应。
-			PHASE_V_cb();                               
-		}
-		last_tick = tick;
-}
-
-void PHASE_W_isr(void *args)   //W引脚变化会触发本中断处理函数。
-{
-	static int32_t last_tick = 0;
-	int32_t tick = rt_tick_get();
-		if(tick - last_tick > 3 || tick - last_tick < -3){   //进行消抖的相关配置，剔除大于3个tick的响应。
-			PHASE_W_cb();                               
-		}
-		last_tick = tick;
 }
 
 int pin_setting(){
@@ -153,9 +126,9 @@ int pin_setting(){
 		rt_pin_mode(GPIO_MO1, PIN_MODE_OUTPUT);
 			
 		//设置U,V,W为中断触(上升沿下降沿都触发的方式)
-		rt_pin_attach_irq(GPIO_PHASE_U, PIN_IRQ_MODE_RISING_FALLING, PHASE_U_isr, 0); 
-		rt_pin_attach_irq(GPIO_PHASE_V, PIN_IRQ_MODE_RISING_FALLING, PHASE_V_isr, 0); 
-		rt_pin_attach_irq(GPIO_PHASE_W, PIN_IRQ_MODE_RISING_FALLING, PHASE_W_isr, 0); 
+		rt_pin_attach_irq(GPIO_PHASE_U, PIN_IRQ_MODE_RISING_FALLING, PHASE_U_cb, 0); 
+		rt_pin_attach_irq(GPIO_PHASE_V, PIN_IRQ_MODE_RISING_FALLING, PHASE_V_cb, 0); 
+		rt_pin_attach_irq(GPIO_PHASE_W, PIN_IRQ_MODE_RISING_FALLING, PHASE_W_cb, 0); 
     rt_pin_irq_enable(GPIO_PHASE_U,1);   //使能3个中断
     rt_pin_irq_enable(GPIO_PHASE_V,1);
     rt_pin_irq_enable(GPIO_PHASE_W,1);

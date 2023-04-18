@@ -18,7 +18,7 @@
 
 #define MAX_PERIOD 65535
 #define MIN_PERIOD 3
-#define MIN_PULSE 2
+#define MIN_PULSE 1
 
 extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
