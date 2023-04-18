@@ -9,13 +9,11 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 #include "definitions.h"
-#define SAMPLE_UART_NAME       "uart2"
+#define SAMPLE_UART_NAME  "uart2"
 
 
 /* 用于接收消息的信号量 */
 struct rt_semaphore rx_sem;
-struct rt_semaphore tx_sem;
-struct rt_semaphore spi_sem;
 
 static rt_device_t serial;
 

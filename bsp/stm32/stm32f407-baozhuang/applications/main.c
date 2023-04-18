@@ -19,7 +19,7 @@
 /* defined the LED0 pin: PG1 */
 #define LED0_PIN    GET_PIN(G, 1)
 
-int voltage_set = 0,current_set = 0; //存储的电压、电流的值。
+int voltage_set = 500,current_set = 1500; //存储的电压、电流的值。(默认电压为5V（精度为100），电流为15A（精度为100）)
 void para_read(){   //从W25Q64中读取数据
   int fd;
 	uint8_t params[5] = {0};  
@@ -27,12 +27,23 @@ void para_read(){   //从W25Q64中读取数据
 	if(fd >= 0){	//读取成功
 			read(fd, params, sizeof(params));
 			close(fd);	
-			voltage_set = (params[0]<<8) + params[1];
-			current_set = (params[2]<<8) + params[3];
+			if(params[0] > 0 || params[1] > 0 || params[2] > 0 || params[3] > 0){  //如果已经存过参数
+				voltage_set = (params[0]<<8) + params[1];
+				current_set = (params[2]<<8) + params[3];
+			}
+			else{      //如果未存过参数
+				para_write();
+			}
 	}
-	else{  //读取失败
-			voltage_set = 0;
-			current_set = 0;
+	else{  //读取失败，再存1次参数
+				char *type = "elm";
+				int result = 0;
+				result = dfs_mkfs(type, "W25Q64");
+				if (result != RT_EOK)
+				{
+						rt_kprintf("mkfs failed, result=%d\n", result);
+				}
+				para_write();
 	}
 }
 
@@ -79,8 +90,8 @@ extern struct rt_semaphore pwm1_sem;
 extern int percentage_change; //百分比切换标志位，若该标志位为1，代表通道1的percentage发生改变
 
 void PHASE_U_cb(){  //中断回调函数
-	if((run_record == 1 && pwm1_status[1] == 0) || percentage_change == 1){
-		percentage_change = 0;
+	if((run_record == 1 && pwm1_status[1] == 0) || percentage_change == 3){
+		percentage_change--;
 		pwm1_start = 1;  //代表打开通道1 
 		rt_sem_release(&pwm1_sem);
 	}
@@ -88,15 +99,15 @@ void PHASE_U_cb(){  //中断回调函数
 
 void PHASE_V_cb(){
 	if((run_record == 1 && pwm1_status[2] == 0) || percentage_change == 2){
-		percentage_change = 0;
+		percentage_change--;
 		pwm1_start = 2;  //代表打开通道2 
 		rt_sem_release(&pwm1_sem);
 	}	
 }
 
 void PHASE_W_cb(){
-	if((run_record == 1 && pwm1_status[3] == 0) || percentage_change == 3){
-		percentage_change = 0;
+	if((run_record == 1 && pwm1_status[3] == 0) || percentage_change == 1){
+		percentage_change--;
 		pwm1_start = 3;  //代表打开通道3
 		rt_sem_release(&pwm1_sem);
 	}	

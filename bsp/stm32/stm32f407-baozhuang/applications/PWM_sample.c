@@ -12,7 +12,7 @@
 struct rt_device_pwm *pwm_dev;      /* PWM设备句柄 */
 /* 用于PWM的信号量 */
 struct rt_semaphore pwm1_sem;
-int pwm1_start = 0,pwm1_end = 0; //pwm1_start = 1代表要开启通道1，pwm1_end = 1代表关闭通道1
+int pwm1_start = 0; //pwm1_start = 1代表要开启通道1
 int percentage_set = 5;  //百分比设定，最开始按照百分之5去充电
 rt_uint32_t period = 10000000;    /* 周期为10ms，单位为纳秒ns */
 rt_uint32_t pulse = 1000000;     /* PWM脉冲宽度值1ms，单位为纳秒ns */
@@ -31,19 +31,17 @@ void pwm_thread_entry(void *parameter){
 					pwm1_status[pwm1_start] = 1;
 					pwm1_start = 0;
 				}
-				else if(pwm1_end != 0)   //代表要关闭PWM通道
+				else   //代表要关闭所有PWM通道
 				{
 					/* 关闭通道 */
-					rt_pwm_set(pwm_dev, pwm1_end, period*2, 0);  //设置脉宽为0，停止发送脉冲
-					pwm1_status[pwm1_end] = 0;
-					pwm1_end = 0;
-					if(pwm1_status[1] == 0 && pwm1_status[2] == 0 && pwm1_status[3] == 0)  //如果三个通道都关闭的话，代表充电完成
-					{
-							percentage_set = 5;  //继续给百分比设置初值，为下一次充电做准备
-							run_record  = 0;
-							rt_pin_write(GPIO_MO1,0); //继电器输出
-							rt_thread_mdelay(1000);   //适当延时1S
-							rt_pin_write(GPIO_MO1,1); //继电器停止输出
+					for(int i = 1; i < 4; i++){
+						rt_pwm_set(pwm_dev, i, period*2, 0);  //设置脉宽为0，停止发送脉冲
+						pwm1_status[i] = 0;
+						percentage_set = 5;  //继续给百分比设置初值，为下一次充电做准备
+						run_record  = 0;
+						rt_pin_write(GPIO_MO1,0); //继电器输出
+						rt_thread_mdelay(1000);   //适当延时1S
+						rt_pin_write(GPIO_MO1,1); //继电器停止输出
 					}
 				}
 		}

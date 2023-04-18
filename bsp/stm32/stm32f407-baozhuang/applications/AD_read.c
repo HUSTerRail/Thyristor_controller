@@ -32,13 +32,12 @@ void read_knob_vol_entry(void *parameter)
 			rt_adc_enable(adc_dev, i);
 		}
 		extern int voltage_set;
-		extern int pwm1_end;
-		extern int pwm1_status[4];
 		extern struct rt_semaphore pwm1_sem;
 		extern int percentage_set;
 		extern int run_record;
-		int voltage_percentage_table[2][20] = {{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100},
-																					{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100}};  //电压和速比的对照表
+		//电压和速比的对照表
+		int voltage_percentage_table[2][20] = {{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100},   //电压
+																					{5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100}};   //速比
     while (1)
     {
         /* rt_adc_read(adc_dev, i)读取采样值 */
@@ -52,26 +51,21 @@ void read_knob_vol_entry(void *parameter)
 				last_voltage[i] = adc_voltage[i];                                     //存贮本次数据
 				}
 				if(run_record == 1){
-					for(int i = 2;i <= 4;i++){  //为U、V、W电压，检测是否到达设定电压值。
-							if(pwm1_status[i-1]){  //如果当前通道处于开通状态
-								if(adc_voltage[i] >= voltage_set){  //达到电压值且处于PWM通道处于打开状态
-										pwm1_end = i - 1;  //代表关闭通道i-1
-										rt_sem_release(&pwm1_sem);
-								}
-								if(percentage_set < 100)  //如果还未到达百分百速比
-								{
-									for(int j = 0;j < 19;j++){
-											if(adc_voltage[i] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
-											{
-													percentage_set = voltage_percentage_table[1][j+1];
-													percentage_change = i - 1;
-													break;
-											}
-									}
-								}
+						if(adc_voltage[1] >= voltage_set){  //达到电压值且处于PWM通道处于打开状态
+								rt_sem_release(&pwm1_sem);
 						}
-					}
-				}
+						if(percentage_set < 100)  //如果还未到达百分百速比
+						{
+							for(int j = 0;j < 19;j++){
+									if(adc_voltage[1] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
+									{
+											percentage_set = voltage_percentage_table[1][j+1];
+											percentage_change = 3;  //需要进行三次改变，即三路电压都要改变
+											break;
+									}
+							}
+						}						
+				}								
         rt_thread_mdelay(5);  //线程里面需要有延时函数
     }
 }
