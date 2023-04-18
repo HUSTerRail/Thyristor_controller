@@ -63,5 +63,5 @@ typedef struct _gpio_port {
 } GPIO_Port;
 int read_knob_vol_thread(void);
 int pwm_led_sample(void);
-void para_write(void);
+void para_write(int voltage_set_obay,int current_set_obay);
 #endif /* APPLICATIONS_DEFINITIONS_H_ */

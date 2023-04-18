@@ -32,7 +32,7 @@ void para_read(){   //从W25Q64中读取数据
 				current_set = (params[2]<<8) + params[3];
 			}
 			else{      //如果未存过参数
-				para_write();
+				para_write(voltage_set,current_set);
 			}
 	}
 	else{  //读取失败，再存1次参数
@@ -43,28 +43,27 @@ void para_read(){   //从W25Q64中读取数据
 				{
 						rt_kprintf("mkfs failed, result=%d\n", result);
 				}
-				para_write();
+				para_write(voltage_set,current_set);
 	}
 }
 
-void para_write(void){   //向W25Q64中写入数据
-  int fd;
-	uint8_t params[4] = {0};
-	params[0] = (((uint16_t)voltage_set) & 0xff00)>>8; //电压高8位
-	params[1] = (((uint16_t)voltage_set) & 0x00ff);    //电压低8位
-	params[2] = (((uint16_t)current_set) & 0xff00)>>8;
-	params[3] = (((uint16_t)current_set) & 0x00ff);
-	fd = open("/params.dat", O_WRONLY);
-	if(fd >= 0){	//读取成功
-			write(fd, params, sizeof(params));
-			close(fd);	
-	}	
+void para_write(int voltage_set_obay,int current_set_obay){   //向W25Q64中写入数据
+		int fd;
+		uint8_t params[4] = {0};
+		params[0] = (((uint16_t)voltage_set_obay) & 0xff00)>>8; //电压高8位
+		params[1] = (((uint16_t)voltage_set_obay) & 0x00ff);    //电压低8位
+		params[2] = (((uint16_t)current_set_obay) & 0xff00)>>8;
+		params[3] = (((uint16_t)current_set_obay) & 0x00ff);
+		fd = open("/params.dat", O_WRONLY);
+		if(fd >= 0){	//读取成功
+				write(fd, params, sizeof(params));
+				close(fd);	
+		}	
 }
 
 int main(void)
 {
     int count = 1;
-		para_read();  //上电读取flash中的参数
 		read_knob_vol_thread();
 		extern void MX_TIM1_Init(void);
 		MX_TIM1_Init();  ///定时器1PWM模式初始化
@@ -187,8 +186,10 @@ void gpio_entry(void *parameters)
     rt_tick_t sensor_tick = rt_tick_get();  //获取当前的tick时间	
 		for (;;)   //一直处于for循环之中，时刻获取所有输入引脚的电位
 		{
-				if(gpio_port.input.bit4 == 0 && gpio_port.input.bit5 == 1)  //代表启动
+				if(gpio_port.input.bit4 == 0 && gpio_port.input.bit5 == 1){  //代表启动
+						para_read();  //读取一下当前设定的电压值和电流值
 						run_record = 1;
+				}
         do
         {
 						port_pre.input.word = port_in.input.word;

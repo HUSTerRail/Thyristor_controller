@@ -47,7 +47,7 @@ static void serial_thread_entry(void *parameter)
             rt_sem_take(&rx_sem, RT_WAITING_FOREVER);
         }
         /* 读取到的数据通过串口错位输出 */
-				if(ch == 0x01) //代表上位机要读取从机的7路AD数值
+				if(ch == 0x01 && start == 0) //代表上位机要读取从机的7路AD数值
 				{
 					//发送的格式为先发送AD0~AD6的高8位，再发送低8位
 					for(int i = 0;i < 7;i++){
@@ -61,31 +61,26 @@ static void serial_thread_entry(void *parameter)
 				{
 						start = 1;
 				}
-				if(start == 1) //开始接收电压高8位
+				else if(start == 1) //开始接收电压高8位
 				{
 						voltage_recv = ch<<8;
 						start++;
 				}
-				if(start == 2) //开始接收电压低8位
+				else if(start == 2) //开始接收电压低8位
 				{
 						voltage_recv += ch;
 						start++;
 				}
-				if(start == 3) //开始接收电流高8位
+				else if(start == 3) //开始接收电流高8位
 				{
 						current_recv = ch<<8;
 						start++;
 				}
-				if(start == 4) //开始接收电流低8位
+				else if(start == 4) //开始接收电流低8位
 				{
 						current_recv += ch;
 						start = 0;
-						if(run_record == 0) //如果还没启动
-						{
-								voltage_set = voltage_recv;
-								current_set = current_recv;
-								para_write(); //数据存储
-						}
+						para_write(voltage_recv,current_recv);; //数据存储
 				}
     }
 }
