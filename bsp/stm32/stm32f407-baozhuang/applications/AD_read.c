@@ -51,22 +51,25 @@ void read_knob_vol_entry(void *parameter)
 				last_voltage[i] = adc_voltage[i];                                     //存贮本次数据
 				}
 				if(run_record == 1){
-						if(adc_voltage[1] >= voltage_set){  //达到电压值且处于PWM通道处于打开状态
+						if(adc_voltage[1] >= 200){  //达到电压值且处于PWM通道处于打开状态
 								rt_sem_release(&pwm1_sem);
 						}
-						if(percentage_set < 100)  //如果还未到达百分百速比
-						{
-							for(int j = 0;j < 19;j++){
-									if(adc_voltage[1] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
-									{
-											percentage_set = voltage_percentage_table[1][j+1];
-											percentage_change = 3;  //需要进行三次改变，即三路电压都要改变
-											break;
-									}
-							}
-						}						
+//						if(adc_voltage[1] >= voltage_set){  //达到电压值且处于PWM通道处于打开状态
+//								rt_sem_release(&pwm1_sem);
+//						}
+//						if(percentage_set < 100)  //如果还未到达百分百速比
+//						{
+//							for(int j = 0;j < 19;j++){
+//									if(adc_voltage[1] >= voltage_percentage_table[0][j] && percentage_set <= voltage_percentage_table[1][j])
+//									{
+//											percentage_set = voltage_percentage_table[1][j+1];
+//											percentage_change = 3;  //需要进行三次改变，即三路电压都要改变
+//											break;
+//									}
+//							}
+//						}						
 				}								
-        rt_thread_mdelay(5);  //线程里面需要有延时函数
+        rt_thread_mdelay(1);  //线程里面需要有延时函数
     }
 }
 

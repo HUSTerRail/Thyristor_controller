@@ -92,6 +92,7 @@ void PHASE_U_cb(void *args){  //中断回调函数
 	if((run_record == 1 && pwm1_status[1] == 0) || percentage_change == 3){
 		if(percentage_change == 3)
 				percentage_change--;
+		pwm1_status[1] = 1;
 		pwm1_start = 1;  //代表打开通道1 
 		rt_sem_release(&pwm1_sem);
 	}
@@ -101,6 +102,7 @@ void PHASE_V_cb(void *args){
 	if((run_record == 1 && pwm1_status[2] == 0) || percentage_change == 2){
 		if(percentage_change == 2)
 				percentage_change--;
+		pwm1_status[2] = 1;
 		pwm1_start = 2;  //代表打开通道2 
 		rt_sem_release(&pwm1_sem);
 	}	
@@ -110,6 +112,7 @@ void PHASE_W_cb(void *args){
 	if((run_record == 1 && pwm1_status[3] == 0) || percentage_change == 1){
 		if(percentage_change == 1)
 				percentage_change--;
+		pwm1_status[3] = 1;
 		pwm1_start = 3;  //代表打开通道3
 		rt_sem_release(&pwm1_sem);
 	}	
@@ -126,14 +129,18 @@ int pin_setting(){
 		rt_pin_mode(GPIO_MO1, PIN_MODE_OUTPUT);
 			
 		//设置U,V,W为中断触(上升沿下降沿都触发的方式)
-		rt_pin_attach_irq(GPIO_PHASE_U, PIN_IRQ_MODE_RISING_FALLING, PHASE_U_cb, 0); 
-		rt_pin_attach_irq(GPIO_PHASE_V, PIN_IRQ_MODE_RISING_FALLING, PHASE_V_cb, 0); 
-		rt_pin_attach_irq(GPIO_PHASE_W, PIN_IRQ_MODE_RISING_FALLING, PHASE_W_cb, 0); 
+		rt_err_t status = RT_EOK ;  
+		status = rt_pin_attach_irq(GPIO_PHASE_U, PIN_IRQ_MODE_RISING_FALLING, PHASE_U_cb, 0); 
+		RT_ASSERT(status == RT_EOK);
+		status = rt_pin_attach_irq(GPIO_PHASE_V, PIN_IRQ_MODE_RISING_FALLING, PHASE_V_cb, 0); 
+		RT_ASSERT(status == RT_EOK);
+		status = rt_pin_attach_irq(GPIO_PHASE_W, PIN_IRQ_MODE_RISING_FALLING, PHASE_W_cb, 0); 
+		RT_ASSERT(status == RT_EOK);
     rt_pin_irq_enable(GPIO_PHASE_U,1);   //使能3个中断
     rt_pin_irq_enable(GPIO_PHASE_V,1);
     rt_pin_irq_enable(GPIO_PHASE_W,1);
 	
-		rt_pin_write(GPIO_MO1, 1);
+		rt_pin_write(GPIO_MO1, 0);
 		return 0;
 }
 
